@@ -63,19 +63,36 @@
     </div>
   </div>
 
-  <script>
-    // Persistent counter (per browser/device)
-    const KEY = "blocksite_redirect_count_v1";
-    const count = Number(localStorage.getItem(KEY) || "0") + 1;
-    localStorage.setItem(KEY, String(count));
-    document.getElementById("count").textContent = String(count);
+<script>
+  const COUNT_KEY = "blocksite_daily_count";
+  const DATE_KEY  = "blocksite_last_date";
 
-    // Optional: show blocked URL if Blocksite passes it
-    const params = new URLSearchParams(location.search);
-    const u = params.get("url") || params.get("u");
-    if (u) {
-      document.getElementById("blockedUrl").textContent = "Blocked URL: " + u;
-    }
-  </script>
+  // Get today's date in *browser local timezone*
+  function getLocalDateString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // YYYY-MM-DD
+  }
+
+  const today = getLocalDateString();
+  const lastDate = localStorage.getItem(DATE_KEY);
+  let count = Number(localStorage.getItem(COUNT_KEY) || "0");
+
+  // Reset if a new local day has started
+  if (lastDate !== today) {
+    count = 0;
+    localStorage.setItem(DATE_KEY, today);
+  }
+
+  // Increment for this redirect
+  count += 1;
+  localStorage.setItem(COUNT_KEY, String(count));
+
+  // Update UI
+  document.getElementById("count").textContent = String(count);
+</script>
+
 </body>
 </html>
