@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blocked — Back to Work</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; }
+    .wrap { max-width: 720px; padding: 32px; margin: 0 auto; }
+    .card { border: 1px solid #ddd; border-radius: 16px; padding: 24px; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .muted { color: #555; line-height: 1.5; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+    .stat { flex: 1; min-width: 220px; border: 1px solid #eee; border-radius: 14px; padding: 16px; }
+    .num { font-size: 44px; font-weight: 700; }
+    button { border: 0; border-radius: 12px; padding: 12px 14px; font-size: 15px; cursor: pointer; }
+    .primary { background: #111; color: #fff; }
+    .ghost { background: #f2f2f2; }
+    .small { font-size: 13px; color: #666; margin-top: 8px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Blocked ✅</h1>
+      <div class="muted">You were redirected here to stay focused.</div>
+
+      <div class="row">
+        <div class="stat">
+          <div class="muted">Redirect count (this browser)</div>
+          <div class="num" id="count">0</div>
+          <div class="small">Stored in localStorage on this device/browser.</div>
+        </div>
+
+        <div class="stat">
+          <div class="muted">Time on this page</div>
+          <div class="num" id="seconds">0</div>
+          <div class="small">Quick cooldown timer.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="resetBtn">Reset count</button>
+        <button class="ghost" id="copyBtn">Copy count</button>
+      </div>
+
+      <div class="small" id="blockedUrl"></div>
+    </div>
+  </div>
+
+  <script>
+    // Persisted counter
+    const KEY = "blocksite_redirect_count_v1";
+    const count = Number(localStorage.getItem(KEY) || "0") + 1;
+    localStorage.setItem(KEY, String(count));
+    document.getElementById("count").textContent = String(count);
+
+    // Optional: show blocked URL if Blocksite passes it as ?url=...
+    const params = new URLSearchParams(location.search);
+    const u = params.get("url") || params.get("u");
+    if (u) document.getElementById("blockedUrl").textContent = "Blocked URL: " + u;
+
+    // Timer
+    let s = 0;
+    setInterval(() => {
+      s += 1;
+      document.getElementById("seconds").textContent = String(s);
+    }, 1000);
+
+    // Buttons
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      localStorage.setItem(KEY, "0");
+      document.getElementById("count").textContent = "0";
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const val = document.getElementById("count").textContent;
+      await navigator.clipboard.writeText(val);
+      alert("Copied: " + val);
+    });
+  </script>
+</body>
+</html>
